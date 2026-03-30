@@ -1,1 +1,1 @@
-# Smart-Resume-Optimizer_-HireBoost-
+# Smart-Resume-Optimizer_HireBoost
