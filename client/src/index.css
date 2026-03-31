@@ -13,10 +13,23 @@
 
   body {
     font-family: 'Inter', system-ui, sans-serif;
-    background-color: #020617;
-    color: #e2e8f0;
+    background-color: #081815;
+    background-image:
+      radial-gradient(circle at top left, rgba(247, 231, 206, 0.12), transparent 32%),
+      radial-gradient(circle at 85% 20%, rgba(94, 130, 116, 0.22), transparent 28%),
+      linear-gradient(180deg, rgba(8, 24, 21, 0.96), rgba(8, 24, 21, 1));
+    color: #f7e7ce;
     overflow-x: hidden;
     min-height: 100vh;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  ::selection {
+    background: rgba(226, 195, 146, 0.28);
+    color: #fffaf2;
   }
 
   ::-webkit-scrollbar {
@@ -24,30 +37,33 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #0f172a;
+    background: #102c26;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #53625d;
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+    background: #7f7462;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-dark-800/60 backdrop-blur-xl border border-dark-700/50 rounded-2xl shadow-xl;
+    @apply bg-dark-800/70 backdrop-blur-2xl border border-dark-600/45 rounded-[28px] shadow-2xl shadow-black/20;
+    box-shadow:
+      0 24px 60px rgba(0, 0, 0, 0.18),
+      inset 0 1px 0 rgba(255, 250, 242, 0.05);
   }
 
   .glass-card-hover {
-    @apply glass-card transition-all duration-300 hover:border-primary-500/30 hover:shadow-primary-500/10 hover:shadow-2xl hover:-translate-y-1;
+    @apply glass-card transition-all duration-300 hover:border-accent-400/35 hover:shadow-accent-500/10 hover:shadow-2xl hover:-translate-y-1.5;
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-primary-400 via-primary-300 to-accent-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-accent-100 via-accent-300 to-primary-200 bg-clip-text text-transparent;
   }
 
   .gradient-bg {
@@ -65,52 +81,52 @@
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(135deg, #6366f1, #10b981);
+    background: linear-gradient(135deg, rgba(226, 195, 146, 0.95), rgba(16, 44, 38, 0.9));
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
   }
 
   .btn-primary {
-    @apply px-6 py-3 rounded-xl font-semibold text-white gradient-bg 
-           hover:opacity-90 active:scale-95 transition-all duration-200
-           shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40;
+    @apply px-6 py-3 rounded-xl font-semibold text-dark-50 gradient-bg border border-accent-400/20
+           hover:-translate-y-0.5 active:scale-95 transition-all duration-200
+           shadow-lg shadow-black/25 hover:shadow-accent-500/20;
   }
 
   .btn-secondary {
-    @apply px-6 py-3 rounded-xl font-semibold text-primary-300 
-           bg-primary-500/10 border border-primary-500/30
-           hover:bg-primary-500/20 hover:border-primary-500/50 
+    @apply px-6 py-3 rounded-xl font-semibold text-accent-200
+           bg-accent-500/10 border border-accent-400/30
+           hover:bg-accent-500/20 hover:border-accent-300/50
            active:scale-95 transition-all duration-200;
   }
 
   .btn-ghost {
     @apply px-6 py-3 rounded-xl font-semibold text-dark-300
-           hover:bg-dark-700/50 hover:text-white
+           hover:bg-dark-700/50 hover:text-dark-50 hover:border-dark-600/40
            active:scale-95 transition-all duration-200;
   }
 
   .input-field {
     @apply w-full px-4 py-3 rounded-xl bg-dark-900/80 border border-dark-600/50 
            text-dark-100 placeholder-dark-500 
-           focus:outline-none focus:border-primary-500/50 focus:ring-2 focus:ring-primary-500/20
+           focus:outline-none focus:border-accent-400/50 focus:ring-2 focus:ring-accent-400/15
            transition-all duration-200;
   }
 
   .badge-present {
-    @apply px-3 py-1 rounded-full text-xs font-medium bg-accent-500/15 text-accent-400 border border-accent-500/25;
+    @apply px-3 py-1 rounded-full text-xs font-medium bg-primary-400/15 text-primary-100 border border-primary-300/25;
   }
 
   .badge-missing {
-    @apply px-3 py-1 rounded-full text-xs font-medium bg-danger/15 text-red-400 border border-danger/25;
+    @apply px-3 py-1 rounded-full text-xs font-medium bg-danger/15 text-danger border border-danger/25;
   }
 
   .badge-info {
-    @apply px-3 py-1 rounded-full text-xs font-medium bg-primary-500/15 text-primary-300 border border-primary-500/25;
+    @apply px-3 py-1 rounded-full text-xs font-medium bg-accent-500/15 text-accent-200 border border-accent-400/25;
   }
 
   .section-heading {
-    @apply font-display text-2xl font-bold text-white mb-2;
+    @apply font-display text-2xl font-bold text-dark-50 mb-2;
   }
 
   .hero-glow {
@@ -118,8 +134,8 @@
     width: 600px;
     height: 600px;
     border-radius: 50%;
-    filter: blur(120px);
-    opacity: 0.15;
+    filter: blur(140px);
+    opacity: 0.18;
     pointer-events: none;
     z-index: 0;
   }
