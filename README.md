@@ -31,7 +31,7 @@ Transform your resume with AI. Upload your resume, paste a job description, and 
 
 ```bash
 # Install backend dependencies
-cd server && npm install
+cd scerver && npm install
 
 # Install frontend dependencies
 cd ../client && npm install

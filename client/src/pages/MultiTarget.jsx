@@ -81,7 +81,7 @@ export default function MultiTarget() {
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <LoadingSpinner message={`Analyzing your resume against ${jobs.filter((job) => job.text.trim()).length} job descriptions...`} />
+        <LoadingSpinner message={`Analyzing your resume against ${jobs.filter((job) => job.text.trim()).length} job descriptions... 🔍`} />
       </div>
     );
   }
@@ -90,18 +90,19 @@ export default function MultiTarget() {
     <div className="max-w-7xl mx-auto px-4 py-12">
       <MotionDiv initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="text-center mb-12">
-          <h1 className="font-display text-3xl sm:text-4xl font-bold text-dark-50 mb-3">
+          <div className="text-4xl mb-3">🎯</div>
+          <h1 className="font-display text-3xl sm:text-4xl font-bold text-charcoal-800 mb-3">
             Multi-Job <span className="gradient-text">Targeting</span>
           </h1>
-          <p className="text-dark-300 text-lg">
+          <p className="text-charcoal-500 text-lg">
             Compare your resume against multiple roles to find your strongest fit.
           </p>
         </div>
 
         {error && (
-          <div className="max-w-2xl mx-auto mb-6 p-4 rounded-2xl bg-danger/10 border border-danger/25 text-danger text-sm flex items-center justify-between">
-            <span>{error}</span>
-            <button onClick={() => setError('')} className="hover:text-dark-50 transition-colors">
+          <div className="max-w-2xl mx-auto mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-600 text-sm flex items-center justify-between">
+            <span>⚠️ {error}</span>
+            <button onClick={() => setError('')} className="hover:text-red-800 transition-colors">
               <HiOutlineX className="w-4 h-4" />
             </button>
           </div>
@@ -109,9 +110,10 @@ export default function MultiTarget() {
 
         {!results ? (
           <>
-            <div className="glass-card p-6 mb-8 max-w-3xl mx-auto">
-              <h2 className="text-lg font-semibold text-dark-50 mb-4 flex items-center gap-2">
-                <HiOutlineDocumentText className="w-5 h-5 text-accent-200" />
+            {/* Resume Upload */}
+            <div className="warm-card p-6 mb-8 max-w-3xl mx-auto">
+              <h2 className="text-lg font-semibold text-charcoal-800 mb-4 flex items-center gap-2">
+                <span className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-sm">📄</span>
                 Your Resume
               </h2>
 
@@ -122,11 +124,11 @@ export default function MultiTarget() {
                     onClick={() => setInputMode(mode)}
                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                       inputMode === mode
-                        ? 'bg-accent-500/10 text-accent-100 border border-accent-400/25'
-                        : 'text-dark-400 hover:text-dark-50 hover:bg-dark-700/40'
+                        ? 'bg-primary-50 text-primary-700 border border-primary-200'
+                        : 'text-charcoal-400 hover:text-charcoal-700 hover:bg-charcoal-50'
                     }`}
                   >
-                    {mode === 'upload' ? 'Upload PDF' : 'Paste Text'}
+                    {mode === 'upload' ? '📤 Upload PDF' : '📋 Paste Text'}
                   </button>
                 ))}
               </div>
@@ -134,33 +136,33 @@ export default function MultiTarget() {
               {inputMode === 'upload' ? (
                 <div
                   {...getRootProps()}
-                  className={`border-2 border-dashed rounded-[24px] p-8 text-center cursor-pointer transition-all ${
+                  className={`border-2 border-dashed rounded-3xl p-8 text-center cursor-pointer transition-all ${
                     isDragActive
-                      ? 'border-accent-400 bg-accent-500/10'
+                      ? 'border-primary-400 bg-primary-50'
                       : resumeFile
-                        ? 'border-primary-300/50 bg-primary-400/10'
-                        : 'border-dark-600 hover:border-accent-400/40 hover:bg-dark-800/40'
+                        ? 'border-primary-300 bg-primary-50/50'
+                        : 'border-charcoal-200 hover:border-amber-400 hover:bg-amber-50/50'
                   }`}
                 >
                   <input {...getInputProps()} />
                   {resumeFile ? (
                     <div className="flex items-center justify-center gap-3">
-                      <HiOutlineDocumentText className="w-6 h-6 text-primary-100" />
-                      <span className="text-primary-100 font-medium">{resumeFile.name}</span>
+                      <HiOutlineDocumentText className="w-6 h-6 text-primary-600" />
+                      <span className="text-primary-700 font-medium">{resumeFile.name}</span>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setResumeFile(null);
                         }}
-                        className="text-danger hover:text-accent-100 transition-colors"
+                        className="text-red-500 hover:text-red-700 transition-colors"
                       >
                         <HiOutlineX className="w-5 h-5" />
                       </button>
                     </div>
                   ) : (
                     <div>
-                      <HiOutlineCloudUpload className="w-8 h-8 text-accent-200 mx-auto mb-2" />
-                      <p className="text-dark-300">Drop your resume PDF here</p>
+                      <HiOutlineCloudUpload className="w-8 h-8 text-amber-500 mx-auto mb-2" />
+                      <p className="text-charcoal-600">Drop your resume PDF here</p>
                     </div>
                   )}
                 </div>
@@ -174,9 +176,10 @@ export default function MultiTarget() {
               )}
             </div>
 
+            {/* Job Descriptions */}
             <div className="max-w-3xl mx-auto space-y-4 mb-8">
               <div className="flex items-center justify-between gap-3">
-                <h2 className="text-lg font-semibold text-dark-50">Job Descriptions ({jobs.length}/5)</h2>
+                <h2 className="text-lg font-semibold text-charcoal-800">🎯 Job Descriptions ({jobs.length}/5)</h2>
                 {jobs.length < 5 && (
                   <button onClick={addJob} className="btn-secondary text-sm py-2 px-4 flex items-center gap-2">
                     <HiOutlinePlus className="w-4 h-4" />
@@ -190,12 +193,12 @@ export default function MultiTarget() {
                   key={i}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="glass-card p-5"
+                  className="warm-card p-5"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-accent-200 font-medium text-sm">Job #{i + 1}</span>
+                    <span className="text-amber-700 font-medium text-sm bg-amber-50 px-3 py-1 rounded-full border border-amber-200">Job #{i + 1}</span>
                     {jobs.length > 1 && (
-                      <button onClick={() => removeJob(i)} className="text-danger hover:text-accent-100 transition-colors">
+                      <button onClick={() => removeJob(i)} className="text-red-400 hover:text-red-600 transition-colors">
                         <HiOutlineTrash className="w-4 h-4" />
                       </button>
                     )}
@@ -226,6 +229,7 @@ export default function MultiTarget() {
               ))}
             </div>
 
+            {/* Analyze Button */}
             <div className="text-center">
               <button
                 onClick={handleAnalyze}
@@ -233,16 +237,18 @@ export default function MultiTarget() {
                 className="btn-primary text-lg px-10 py-4 inline-flex items-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <HiOutlineSparkles className="w-6 h-6" />
-                Compare All Jobs
+                Compare All Jobs ✨
               </button>
             </div>
           </>
         ) : (
           <div>
             <div className="flex items-center justify-between mb-8 gap-3">
-              <h2 className="text-xl font-semibold text-dark-50">Comparison Results</h2>
+              <h2 className="text-xl font-semibold text-charcoal-800 flex items-center gap-2">
+                <span>📊</span> Comparison Results
+              </h2>
               <button onClick={() => setResults(null)} className="btn-secondary text-sm py-2 px-4">
-                Back to Input
+                ← Back to Input
               </button>
             </div>
 
@@ -257,21 +263,21 @@ export default function MultiTarget() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1 }}
-                    className={`glass-card p-6 relative ${isBest ? 'ring-2 ring-accent-400/45' : ''}`}
+                    className={`warm-card p-6 relative ${isBest ? 'ring-2 ring-amber-400' : ''}`}
                   >
                     {isBest && (
-                      <div className="absolute -top-3 left-4 px-3 py-1 rounded-full bg-accent-500 text-dark-950 text-xs font-bold">
-                        Best Fit
+                      <div className="absolute -top-3 left-4 px-3 py-1 rounded-full bg-amber-500 text-white text-xs font-bold">
+                        🏆 Best Fit
                       </div>
                     )}
 
                     <div className="text-center mb-4">
-                      <h3 className="text-lg font-semibold text-dark-50">{resultItem.jobTitle}</h3>
-                      <p className="text-dark-300 text-sm">{resultItem.company}</p>
+                      <h3 className="text-lg font-semibold text-charcoal-800">{resultItem.jobTitle}</h3>
+                      <p className="text-charcoal-500 text-sm">{resultItem.company}</p>
                     </div>
 
                     {resultItem.error ? (
-                      <p className="text-danger text-sm text-center">{resultItem.error}</p>
+                      <p className="text-red-500 text-sm text-center">{resultItem.error}</p>
                     ) : (
                       <>
                         <div className="flex justify-center mb-4">
@@ -279,23 +285,23 @@ export default function MultiTarget() {
                         </div>
 
                         <div className="space-y-2 text-sm">
-                          <div className="flex justify-between text-dark-400">
+                          <div className="flex justify-between text-charcoal-500">
                             <span>Keywords Match</span>
-                            <span className="text-dark-50 font-medium">{resultItem.analysis?.atsScore?.keywordMatch || 0}%</span>
+                            <span className="text-charcoal-800 font-medium">{resultItem.analysis?.atsScore?.keywordMatch || 0}%</span>
                           </div>
-                          <div className="flex justify-between text-dark-400">
+                          <div className="flex justify-between text-charcoal-500">
                             <span>Missing Skills</span>
-                            <span className="text-danger font-medium">{resultItem.analysis?.keywords?.missing?.length || 0}</span>
+                            <span className="text-red-500 font-medium">{resultItem.analysis?.keywords?.missing?.length || 0}</span>
                           </div>
-                          <div className="flex justify-between text-dark-400">
+                          <div className="flex justify-between text-charcoal-500">
                             <span>Present Skills</span>
-                            <span className="text-primary-100 font-medium">{resultItem.analysis?.keywords?.present?.length || 0}</span>
+                            <span className="text-primary-600 font-medium">{resultItem.analysis?.keywords?.present?.length || 0}</span>
                           </div>
                         </div>
 
                         {resultItem.analysis?.keywords?.missing?.length > 0 && (
-                          <div className="mt-4 pt-4 border-t border-dark-700">
-                            <p className="text-xs text-dark-500 mb-2">Top missing skills:</p>
+                          <div className="mt-4 pt-4 border-t border-warm-border">
+                            <p className="text-xs text-charcoal-400 mb-2">Top missing skills:</p>
                             <div className="flex flex-wrap gap-1">
                               {resultItem.analysis.keywords.missing.slice(0, 5).map((keyword, j) => (
                                 <span key={j} className="badge-missing text-[10px]">{keyword}</span>

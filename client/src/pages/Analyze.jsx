@@ -8,6 +8,7 @@ import {
   HiOutlineSparkles,
   HiOutlineX,
   HiOutlineLink,
+  HiOutlineCheck,
 } from 'react-icons/hi';
 import { analyzeResume, importLinkedIn } from '../services/api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -99,51 +100,74 @@ export default function Analyze() {
     );
   }
 
+  const hasResume = resumeFile || resumeText.trim();
+  const hasJD = jdText.trim();
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
       <MotionDiv initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="text-center mb-12">
-          <h1 className="font-display text-3xl sm:text-4xl font-bold text-dark-50 mb-3">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <div className="text-4xl mb-3">📝</div>
+          <h1 className="font-display text-3xl sm:text-4xl font-bold text-charcoal-800 mb-3">
             Analyze Your <span className="gradient-text">Resume</span>
           </h1>
-          <p className="text-dark-300 text-lg">
+          <p className="text-charcoal-500 text-lg">
             Upload your resume and paste the job description to get AI-powered insights.
           </p>
         </div>
 
+        {/* Step Indicator */}
+        <div className="max-w-md mx-auto flex items-center mb-10">
+          <div className={`step-dot ${hasResume ? 'step-dot-completed' : 'step-dot-active'}`}>
+            {hasResume ? <HiOutlineCheck className="w-5 h-5" /> : '1'}
+          </div>
+          <div className={`step-line ${hasResume ? 'step-line-active' : 'step-line-pending'}`} />
+          <div className={`step-dot ${hasJD ? 'step-dot-completed' : hasResume ? 'step-dot-active' : 'step-dot-pending'}`}>
+            {hasJD ? <HiOutlineCheck className="w-5 h-5" /> : '2'}
+          </div>
+          <div className={`step-line ${hasResume && hasJD ? 'step-line-active' : 'step-line-pending'}`} />
+          <div className={`step-dot ${hasResume && hasJD ? 'step-dot-active' : 'step-dot-pending'}`}>
+            3
+          </div>
+        </div>
+
+        {/* Error */}
         {error && (
           <MotionDiv
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="max-w-2xl mx-auto mb-6 p-4 rounded-2xl bg-danger/10 border border-danger/25 text-danger text-sm flex items-center justify-between"
+            className="max-w-2xl mx-auto mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-600 text-sm flex items-center justify-between"
           >
-            <span>{error}</span>
-            <button onClick={() => setError('')} className="hover:text-dark-50 transition-colors">
+            <span>⚠️ {error}</span>
+            <button onClick={() => setError('')} className="hover:text-red-800 transition-colors">
               <HiOutlineX className="w-4 h-4" />
             </button>
           </MotionDiv>
         )}
 
+        {/* Main Content */}
         <div className="grid lg:grid-cols-2 gap-8">
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-dark-50 mb-4 flex items-center gap-2">
-              <HiOutlineDocumentText className="w-5 h-5 text-accent-200" />
+          {/* Resume Upload Card */}
+          <div className="warm-card p-6">
+            <h2 className="text-lg font-semibold text-charcoal-800 mb-4 flex items-center gap-2">
+              <span className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-sm">📄</span>
               Your Resume
             </h2>
 
             <div className="flex gap-2 mb-5 flex-wrap">
               {[
-                { key: 'upload', label: 'Upload PDF' },
-                { key: 'paste', label: 'Paste Text' },
-                { key: 'linkedin', label: 'LinkedIn' },
+                { key: 'upload', label: '📤 Upload PDF' },
+                { key: 'paste', label: '📋 Paste Text' },
+                { key: 'linkedin', label: '🔗 LinkedIn' },
               ].map(({ key, label }) => (
                 <button
                   key={key}
                   onClick={() => setInputMode(key)}
                   className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                     inputMode === key
-                      ? 'bg-accent-500/10 text-accent-100 border border-accent-400/25'
-                      : 'text-dark-400 hover:text-dark-50 hover:bg-dark-700/40'
+                      ? 'bg-primary-50 text-primary-700 border border-primary-200'
+                      : 'text-charcoal-400 hover:text-charcoal-700 hover:bg-charcoal-50'
                   }`}
                 >
                   {label}
@@ -154,28 +178,28 @@ export default function Analyze() {
             {inputMode === 'upload' && (
               <div
                 {...getRootProps()}
-                className={`border-2 border-dashed rounded-[24px] p-10 text-center cursor-pointer transition-all duration-300 ${
+                className={`border-2 border-dashed rounded-3xl p-10 text-center cursor-pointer transition-all duration-300 ${
                   isDragActive
-                    ? 'border-accent-400 bg-accent-500/10'
+                    ? 'border-primary-400 bg-primary-50'
                     : resumeFile
-                      ? 'border-primary-300/50 bg-primary-400/10'
-                      : 'border-dark-600 hover:border-accent-400/40 hover:bg-dark-800/40'
+                      ? 'border-primary-300 bg-primary-50/50'
+                      : 'border-charcoal-200 hover:border-amber-400 hover:bg-amber-50/50'
                 }`}
               >
                 <input {...getInputProps()} />
                 {resumeFile ? (
                   <div>
-                    <div className="w-14 h-14 rounded-2xl bg-primary-400/15 flex items-center justify-center mx-auto mb-4">
-                      <HiOutlineDocumentText className="w-7 h-7 text-primary-100" />
+                    <div className="w-14 h-14 rounded-2xl bg-primary-100 flex items-center justify-center mx-auto mb-4">
+                      <HiOutlineDocumentText className="w-7 h-7 text-primary-600" />
                     </div>
-                    <p className="text-primary-100 font-medium">{resumeFile.name}</p>
-                    <p className="text-dark-500 text-sm mt-1">{(resumeFile.size / 1024).toFixed(1)} KB</p>
+                    <p className="text-primary-700 font-medium">{resumeFile.name}</p>
+                    <p className="text-charcoal-400 text-sm mt-1">{(resumeFile.size / 1024).toFixed(1)} KB</p>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setResumeFile(null);
                       }}
-                      className="mt-3 text-danger text-sm hover:text-accent-100 flex items-center gap-1 mx-auto transition-colors"
+                      className="mt-3 text-red-500 text-sm hover:text-red-700 flex items-center gap-1 mx-auto transition-colors"
                     >
                       <HiOutlineX className="w-4 h-4" />
                       Remove
@@ -183,13 +207,13 @@ export default function Analyze() {
                   </div>
                 ) : (
                   <div>
-                    <div className="w-14 h-14 rounded-2xl bg-accent-500/10 flex items-center justify-center mx-auto mb-4">
-                      <HiOutlineCloudUpload className="w-7 h-7 text-accent-200" />
+                    <div className="w-14 h-14 rounded-2xl bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                      <HiOutlineCloudUpload className="w-7 h-7 text-amber-600" />
                     </div>
-                    <p className="text-dark-200 font-medium">
-                      {isDragActive ? 'Drop your resume here' : 'Drag and drop your resume PDF'}
+                    <p className="text-charcoal-700 font-medium">
+                      {isDragActive ? 'Drop your resume here! 📥' : 'Drag and drop your resume PDF'}
                     </p>
-                    <p className="text-dark-500 text-sm mt-1">or click to browse | PDF only | Max 5MB</p>
+                    <p className="text-charcoal-400 text-sm mt-1">or click to browse • PDF only • Max 5MB</p>
                   </div>
                 )}
               </div>
@@ -206,8 +230,8 @@ export default function Analyze() {
 
             {inputMode === 'linkedin' && (
               <div>
-                <p className="text-dark-300 text-sm mb-3">
-                  Copy your LinkedIn profile content, including your About, Experience, and Skills sections, and paste it below.
+                <p className="text-charcoal-500 text-sm mb-3">
+                  💡 Copy your LinkedIn profile content, including your About, Experience, and Skills sections.
                 </p>
                 <textarea
                   value={linkedinText}
@@ -227,9 +251,10 @@ export default function Analyze() {
             )}
           </div>
 
-          <div className="glass-card p-6">
-            <h2 className="text-lg font-semibold text-dark-50 mb-4 flex items-center gap-2">
-              <HiOutlineSparkles className="w-5 h-5 text-accent-200" />
+          {/* Job Description Card */}
+          <div className="warm-card p-6">
+            <h2 className="text-lg font-semibold text-charcoal-800 mb-4 flex items-center gap-2">
+              <span className="w-8 h-8 rounded-xl bg-primary-100 flex items-center justify-center text-sm">🎯</span>
               Job Description
             </h2>
             <textarea
@@ -253,6 +278,7 @@ Requirements:
           </div>
         </div>
 
+        {/* Analyze Button */}
         <div className="mt-8 text-center">
           <button
             onClick={handleAnalyze}
@@ -260,9 +286,9 @@ Requirements:
             className="btn-primary text-lg px-12 py-4 inline-flex items-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed animate-pulse-glow"
           >
             <HiOutlineSparkles className="w-6 h-6" />
-            Analyze with AI
+            Analyze with AI ✨
           </button>
-          <p className="text-dark-500 text-sm mt-3">Free | Takes about 30 seconds | Powered by Gemini AI</p>
+          <p className="text-charcoal-400 text-sm mt-3">Free • Takes about 30 seconds • Powered by Gemini AI</p>
         </div>
       </MotionDiv>
     </div>

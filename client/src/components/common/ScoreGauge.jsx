@@ -9,14 +9,14 @@ export default function ScoreGauge({ score = 0, size = 160, strokeWidth = 12, la
 
   const getColor = (value) => {
     if (value >= 71) {
-      return { stroke: '#e2c392', text: 'text-accent-200' };
+      return { stroke: '#10B981', text: 'text-primary-600' };
     }
 
     if (value >= 41) {
-      return { stroke: '#88a99c', text: 'text-primary-100' };
+      return { stroke: '#F59E0B', text: 'text-amber-600' };
     }
 
-    return { stroke: '#b8674f', text: 'text-danger' };
+    return { stroke: '#EF4444', text: 'text-red-500' };
   };
 
   const color = getColor(score);
@@ -50,7 +50,7 @@ export default function ScoreGauge({ score = 0, size = 160, strokeWidth = 12, la
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="rgba(83, 98, 93, 0.45)"
+            stroke="#E5E7EB"
             strokeWidth={strokeWidth}
           />
           <circle
@@ -65,22 +65,22 @@ export default function ScoreGauge({ score = 0, size = 160, strokeWidth = 12, la
             strokeDashoffset={offset}
             style={{
               transition: 'stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
-              filter: `drop-shadow(0 0 10px ${color.stroke}33)`,
+              filter: `drop-shadow(0 0 8px ${color.stroke}40)`,
             }}
           />
         </svg>
         <div
-          className="absolute rounded-full border border-dark-700/50 bg-dark-900/80 shadow-inner shadow-black/20"
+          className="absolute rounded-full bg-white border border-charcoal-100 shadow-inner shadow-charcoal-100/30"
           style={{ inset: innerInset }}
         />
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className={`text-4xl font-display font-bold ${color.text}`}>
             {animatedScore}
           </span>
-          <span className="text-dark-400 text-xs font-medium mt-1">/ 100</span>
+          <span className="text-charcoal-400 text-xs font-medium mt-1">/ 100</span>
         </div>
       </div>
-      <p className="text-dark-300 text-sm font-medium">{label}</p>
+      <p className="text-charcoal-500 text-sm font-medium">{label}</p>
     </div>
   );
 }

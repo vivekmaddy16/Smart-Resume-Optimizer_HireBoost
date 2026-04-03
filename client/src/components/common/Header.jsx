@@ -25,15 +25,13 @@ export default function Header() {
     <HeaderMotion
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className="sticky top-0 z-50 backdrop-blur-xl bg-dark-950/80 border-b border-dark-700/60"
+      className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-warm-border"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-xl gradient-bg border border-accent-400/20 flex items-center justify-center shadow-lg shadow-black/20 group-hover:shadow-accent-500/15 transition-shadow">
-              <HiOutlineSparkles className="w-5 h-5 text-dark-50" />
-            </div>
-            <span className="font-display font-bold text-xl text-dark-50">
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <img src="/logo.png" alt="HireBoost" className="w-9 h-9 group-hover:scale-105 transition-transform" />
+            <span className="font-display font-bold text-xl text-charcoal-800">
               Hire<span className="gradient-text">Boost</span>
             </span>
           </Link>
@@ -49,8 +47,8 @@ export default function Header() {
                   to={to}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                     active
-                      ? 'bg-accent-500/10 text-accent-100 border border-accent-400/25'
-                      : 'text-dark-400 hover:text-dark-50 hover:bg-dark-800/60'
+                      ? 'bg-primary-50 text-primary-700 border border-primary-200'
+                      : 'text-charcoal-500 hover:text-charcoal-800 hover:bg-charcoal-50'
                   }`}
                 >
                   <NavIcon className="w-4 h-4" />
@@ -61,13 +59,13 @@ export default function Header() {
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
-            <Link to="/analyze" className="btn-primary text-sm py-2 px-5">
+            <Link to="/analyze" className="btn-amber text-sm py-2 px-5">
               Start Analysis
             </Link>
           </div>
 
           <button
-            className="md:hidden p-2 text-dark-400 hover:text-dark-50 transition-colors"
+            className="md:hidden p-2 text-charcoal-500 hover:text-charcoal-800 transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
           >
@@ -79,7 +77,7 @@ export default function Header() {
           <MenuMotion
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="md:hidden py-4 border-t border-dark-700/50"
+            className="md:hidden py-4 border-t border-warm-border"
           >
             {links.map(({ to, label, icon }) => {
               const MobileIcon = icon;
@@ -92,8 +90,8 @@ export default function Header() {
                   onClick={() => setMobileOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
                     active
-                      ? 'bg-accent-500/10 text-accent-100 border border-accent-400/20'
-                      : 'text-dark-300 hover:text-dark-50 hover:bg-dark-800/60'
+                      ? 'bg-primary-50 text-primary-700 border border-primary-200'
+                      : 'text-charcoal-500 hover:text-charcoal-800 hover:bg-charcoal-50'
                   }`}
                 >
                   <MobileIcon className="w-5 h-5" />
@@ -102,7 +100,7 @@ export default function Header() {
               );
             })}
             <div className="pt-3 px-4">
-              <Link to="/analyze" onClick={() => setMobileOpen(false)} className="btn-primary block text-center text-sm">
+              <Link to="/analyze" onClick={() => setMobileOpen(false)} className="btn-amber block text-center text-sm">
                 Start Analysis
               </Link>
             </div>
