@@ -1,7 +1,12 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const geminiApiKey = process.env.GEMINI_API_KEY?.trim();
+if (!geminiApiKey) {
+  throw new Error('Missing GEMINI_API_KEY. Please set GEMINI_API_KEY in your .env file or environment.');
+}
+
+const genAI = new GoogleGenerativeAI(geminiApiKey);
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const GEMINI_MAX_RETRIES = Number(process.env.GEMINI_MAX_RETRIES || 3);
 
@@ -86,6 +91,13 @@ async function generateJsonResponse(prompt, taskLabel) {
       const delayMs = Math.min(2000 * (2 ** (attempt - 1)), 8000);
       await sleep(delayMs);
     }
+  }
+
+  if (lastError && getErrorMessage(lastError).toLowerCase().includes('fetch failed')) {
+    throw new AIServiceError('Unable to connect to the Google Gemini API. Please check your internet connection, firewall/proxy settings, and that the Gemini endpoint is reachable.', {
+      statusCode: 502,
+      retryable: true
+    });
   }
 
   if (isRetryableAIError(lastError)) {

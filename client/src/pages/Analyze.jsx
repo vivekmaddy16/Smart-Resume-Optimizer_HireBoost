@@ -63,7 +63,7 @@ export default function Analyze() {
         setInputMode('paste');
       }
     } catch (err) {
-      setError(err.response?.data?.error || 'LinkedIn import failed');
+      setError(err.response?.data?.error || err.message || 'LinkedIn import failed');
     }
 
     setLoading(false);
@@ -87,7 +87,7 @@ export default function Analyze() {
       const result = await analyzeResume(resumeFile, resumeText, jdText);
       navigate('/results', { state: { result, jdText } });
     } catch (err) {
-      setError(err.response?.data?.error || 'Analysis failed. Please try again.');
+      setError(err.response?.data?.error || err.message || 'Analysis failed. Please try again.');
       setLoading(false);
     }
   };

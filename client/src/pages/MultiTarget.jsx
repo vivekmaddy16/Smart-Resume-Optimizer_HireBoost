@@ -72,7 +72,7 @@ export default function MultiTarget() {
       const response = await multiTargetAnalysis(resumeFile, resumeText, validJobs);
       setResults(response.results);
     } catch (err) {
-      setError(err.response?.data?.error || 'Analysis failed');
+      setError(err.response?.data?.error || err.message || 'Analysis failed');
     }
 
     setLoading(false);

@@ -1,10 +1,22 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
+const API_BASE = configuredApiUrl
+  ? configuredApiUrl.replace(/\/+$/, '')
+  : (import.meta.env.DEV ? 'http://localhost:5000/api' : null);
+const API_CONFIGURATION_ERROR = 'Missing VITE_API_URL. Set it to your deployed backend /api URL before using the app in production.';
 
 const api = axios.create({
-  baseURL: API_BASE,
+  baseURL: API_BASE || undefined,
   timeout: 120000, // 2 min timeout for AI processing
+});
+
+api.interceptors.request.use((config) => {
+  if (!API_BASE) {
+    throw new Error(API_CONFIGURATION_ERROR);
+  }
+
+  return config;
 });
 
 /**
