@@ -8,9 +8,11 @@ import {
   HiOutlineCode,
   HiOutlineClipboardCopy,
   HiOutlineCheck,
+  HiOutlineDocumentDownload,
 } from 'react-icons/hi';
 import ScoreGauge from '../components/common/ScoreGauge';
 import { optimizeResume, exportLaTeX } from '../services/api';
+import TemplatePicker from '../components/common/TemplatePicker';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 
 const progressTone = (score = 0) => {
@@ -50,6 +52,7 @@ export default function Results() {
   const [exportingLatex, setExportingLatex] = useState(false);
   const [copiedIdx, setCopiedIdx] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
 
   if (!result) {
     return (
@@ -112,6 +115,8 @@ export default function Results() {
     URL.revokeObjectURL(url);
   };
 
+
+
   const copyToClipboard = (text, idx) => {
     navigator.clipboard.writeText(text);
     setCopiedIdx(idx);
@@ -152,6 +157,12 @@ export default function Results() {
               <HiOutlineSparkles className="w-4 h-4" />
               Generate Optimized Resume
             </button>
+            {optimized && (
+            <button onClick={() => setTemplatePickerOpen(true)} className="btn-amber text-sm py-2 px-5 flex items-center gap-2">
+              <HiOutlineDocumentDownload className="w-4 h-4" />
+              Download PDF
+            </button>
+            )}
             <button onClick={handleExportLatex} disabled={exportingLatex} className="btn-secondary text-sm py-2 px-5 flex items-center gap-2">
               <HiOutlineCode className="w-4 h-4" />
               Export LaTeX
@@ -527,6 +538,11 @@ export default function Results() {
           )}
         </MotionDiv>
       </MotionDiv>
+      <TemplatePicker
+        isOpen={templatePickerOpen}
+        onClose={() => setTemplatePickerOpen(false)}
+        resumeText={optimized?.optimizedResume || resumeText}
+      />
     </div>
   );
 }

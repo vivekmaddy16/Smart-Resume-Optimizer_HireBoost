@@ -213,12 +213,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 px-4 border-t border-warm-border bg-white/50">
-        <div className="max-w-6xl mx-auto text-center text-charcoal-400 text-sm">
-          <p>© 2026 HireBoost. Built with React, Gemini AI, and Tailwind CSS.</p>
-        </div>
-      </footer>
+
     </div>
   );
 }
