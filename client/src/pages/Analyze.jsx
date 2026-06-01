@@ -9,13 +9,16 @@ import {
   HiOutlineX,
   HiOutlineLink,
   HiOutlineCheck,
+  HiOutlineLightningBolt,
 } from 'react-icons/hi';
 import { analyzeResume, importLinkedIn } from '../services/api';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import { useAuth } from '../context/AuthContext';
 
 export default function Analyze() {
   const MotionDiv = motion.div;
   const navigate = useNavigate();
+  const { canAnalyze, hasUsedFreeTrial, isSubscribed, markFreeTrialUsed } = useAuth();
   const [resumeFile, setResumeFile] = useState(null);
   const [resumeText, setResumeText] = useState('');
   const [jdText, setJdText] = useState('');
@@ -70,6 +73,12 @@ export default function Analyze() {
   };
 
   const handleAnalyze = async () => {
+    // Check usage limits
+    if (!canAnalyze) {
+      navigate('/pricing');
+      return;
+    }
+
     if (!jdText.trim()) {
       setError('Please enter a job description');
       return;
@@ -85,6 +94,10 @@ export default function Analyze() {
 
     try {
       const result = await analyzeResume(resumeFile, resumeText, jdText);
+      // Mark free trial as used after successful analysis
+      if (!isSubscribed) {
+        markFreeTrialUsed();
+      }
       navigate('/results', { state: { result, jdText } });
     } catch (err) {
       setError(err.response?.data?.error || err.message || 'Analysis failed. Please try again.');
@@ -106,6 +119,41 @@ export default function Analyze() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
       <MotionDiv initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        {/* Usage Status Banner */}
+        {!canAnalyze && (
+          <MotionDiv
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-2xl mx-auto mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-center justify-between"
+          >
+            <div className="flex items-center gap-2">
+              <HiOutlineLightningBolt className="w-5 h-5 text-amber-600" />
+              <span><strong>Free trial used!</strong> Upgrade to Pro for unlimited analyses.</span>
+            </div>
+            <button
+              onClick={() => navigate('/pricing')}
+              className="px-4 py-1.5 rounded-xl bg-amber-500 text-white text-xs font-semibold hover:bg-amber-600 transition-colors"
+            >
+              Upgrade
+            </button>
+          </MotionDiv>
+        )}
+
+        {/* Plan Badge */}
+        <div className="flex justify-center mb-4">
+          {isSubscribed ? (
+            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary-50 border border-primary-200 text-primary-700 text-xs font-semibold">
+              <HiOutlineLightningBolt className="w-3.5 h-3.5" />
+              Pro Plan ✨
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold">
+              <HiOutlineSparkles className="w-3.5 h-3.5" />
+              Free Trial: {hasUsedFreeTrial ? '0' : '1'} of 1 remaining
+            </div>
+          )}
+        </div>
+
         {/* Header */}
         <div className="text-center mb-10">
           <div className="text-4xl mb-3">📝</div>
@@ -280,15 +328,34 @@ Requirements:
 
         {/* Analyze Button */}
         <div className="mt-8 text-center">
-          <button
-            onClick={handleAnalyze}
-            disabled={(!resumeFile && !resumeText.trim()) || !jdText.trim()}
-            className="btn-primary text-lg px-12 py-4 inline-flex items-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed animate-pulse-glow"
-          >
-            <HiOutlineSparkles className="w-6 h-6" />
-            Analyze with AI ✨
-          </button>
-          <p className="text-charcoal-400 text-sm mt-3">Free • Takes about 30 seconds • Powered by Gemini AI</p>
+          {canAnalyze ? (
+            <>
+              <button
+                onClick={handleAnalyze}
+                disabled={(!resumeFile && !resumeText.trim()) || !jdText.trim()}
+                className="btn-primary text-lg px-12 py-4 inline-flex items-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed animate-pulse-glow"
+              >
+                <HiOutlineSparkles className="w-6 h-6" />
+                Analyze with AI ✨
+              </button>
+              <p className="text-charcoal-400 text-sm mt-3">
+                {isSubscribed ? 'Pro Plan' : 'Free Trial'} • Takes about 30 seconds • Powered by Gemini AI
+              </p>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => navigate('/pricing')}
+                className="btn-amber text-lg px-12 py-4 inline-flex items-center gap-3 animate-pulse-glow"
+              >
+                <HiOutlineLightningBolt className="w-6 h-6" />
+                Upgrade to Pro — ₹99/mo
+              </button>
+              <p className="text-charcoal-400 text-sm mt-3">
+                Your free trial has been used. Upgrade for unlimited analyses.
+              </p>
+            </>
+          )}
         </div>
       </MotionDiv>
     </div>
