@@ -35,7 +35,7 @@ const proPlanFeatures = [
   { label: 'Priority AI Processing', included: true },
 ];
 
-const RAZORPAY_PAYMENT_LINK = 'https://razorpay.me/@vivekmaddheshiya/plink_SwQuZzwqBscmRy';
+const RAZORPAY_PAYMENT_LINK = 'https://rzp.io/rzp/M5er44E';
 
 export default function Pricing() {
   const MotionDiv = motion.div;
