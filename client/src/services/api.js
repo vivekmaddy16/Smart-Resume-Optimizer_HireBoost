@@ -16,6 +16,11 @@ api.interceptors.request.use((config) => {
     throw new Error(API_CONFIGURATION_ERROR);
   }
 
+  const token = localStorage.getItem('hireboost_auth_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
   return config;
 });
 

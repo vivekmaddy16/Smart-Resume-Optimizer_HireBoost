@@ -1,35 +1,12 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import api from '../services/api';
 
 const AuthContext = createContext(null);
 
 const STORAGE_KEYS = {
-  CURRENT_USER: 'hireboost_current_user',
-  USERS_DB: 'hireboost_users',
+  TOKEN: 'hireboost_auth_token',
+  USER: 'hireboost_auth_user',
 };
-
-function getUsersDB() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS_DB) || '{}');
-  } catch {
-    return {};
-  }
-}
-
-function saveUsersDB(db) {
-  localStorage.setItem(STORAGE_KEYS.USERS_DB, JSON.stringify(db));
-}
-
-function getCurrentUserEmail() {
-  return localStorage.getItem(STORAGE_KEYS.CURRENT_USER) || null;
-}
-
-function setCurrentUserEmail(email) {
-  if (email) {
-    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, email);
-  } else {
-    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
-  }
-}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -37,64 +14,75 @@ export function AuthProvider({ children }) {
 
   // Restore session on mount
   useEffect(() => {
-    const email = getCurrentUserEmail();
-    if (email) {
-      const db = getUsersDB();
-      const userData = db[email];
-      if (userData) {
-        setUser(userData);
-      } else {
-        setCurrentUserEmail(null);
+    const savedToken = localStorage.getItem(STORAGE_KEYS.TOKEN);
+    const savedUser = localStorage.getItem(STORAGE_KEYS.USER);
+    if (savedToken && savedUser) {
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch {
+        localStorage.removeItem(STORAGE_KEYS.TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.USER);
       }
     }
     setLoading(false);
   }, []);
 
-  const signup = useCallback((name, email, password) => {
-    const db = getUsersDB();
-    const normalizedEmail = email.toLowerCase().trim();
-
-    if (db[normalizedEmail]) {
-      throw new Error('An account with this email already exists');
+  const signup = useCallback(async (name, email, password) => {
+    try {
+      const response = await api.post('/auth/signup', { name, email, password });
+      return response.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.error || err.message || 'Registration failed');
     }
-
-    const newUser = {
-      name: name.trim(),
-      email: normalizedEmail,
-      password, // In a real app, this would be hashed
-      freeAnalysisUsed: false,
-      subscriptionActive: false,
-      createdAt: new Date().toISOString(),
-    };
-
-    db[normalizedEmail] = newUser;
-    saveUsersDB(db);
-    setCurrentUserEmail(normalizedEmail);
-    setUser(newUser);
-    return newUser;
   }, []);
 
-  const login = useCallback((email, password) => {
-    const db = getUsersDB();
-    const normalizedEmail = email.toLowerCase().trim();
-    const userData = db[normalizedEmail];
+  const login = useCallback(async (email, password) => {
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      const { user: userData, token } = response.data;
 
-    if (!userData) {
-      throw new Error('No account found with this email');
+      localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
+
+      setUser(userData);
+      return userData;
+    } catch (err) {
+      throw new Error(err.response?.data?.error || err.message || 'Login failed');
     }
-
-    if (userData.password !== password) {
-      throw new Error('Incorrect password');
-    }
-
-    setCurrentUserEmail(normalizedEmail);
-    setUser(userData);
-    return userData;
   }, []);
 
   const logout = useCallback(() => {
-    setCurrentUserEmail(null);
+    localStorage.removeItem(STORAGE_KEYS.TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.USER);
     setUser(null);
+  }, []);
+
+  // OTP password recovery integrations
+  const forgotPassword = useCallback(async (email) => {
+    try {
+      const response = await api.post('/auth/forgot-password', { email });
+      return response.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.error || err.message || 'Password reset request failed');
+    }
+  }, []);
+
+  const verifyOtp = useCallback(async (email, otp) => {
+    try {
+      const response = await api.post('/auth/verify-otp', { email, otp });
+      return response.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.error || err.message || 'OTP verification failed');
+    }
+  }, []);
+
+  const resetPassword = useCallback(async (email, otp, newPassword) => {
+    try {
+      const response = await api.post('/auth/reset-password', { email, otp, newPassword });
+      return response.data;
+    } catch (err) {
+      throw new Error(err.response?.data?.error || err.message || 'Password reset failed');
+    }
   }, []);
 
   const hasUsedFreeTrial = user?.freeAnalysisUsed ?? false;
@@ -102,21 +90,32 @@ export function AuthProvider({ children }) {
 
   const canAnalyze = isSubscribed || !hasUsedFreeTrial;
 
-  const markFreeTrialUsed = useCallback(() => {
+  const markFreeTrialUsed = useCallback(async () => {
     if (!user) return;
-    const db = getUsersDB();
-    db[user.email].freeAnalysisUsed = true;
-    saveUsersDB(db);
-    setUser((prev) => ({ ...prev, freeAnalysisUsed: true }));
+    try {
+      const response = await api.post('/auth/update-profile', { freeAnalysisUsed: true });
+      const { user: updatedUser } = response.data;
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    } catch (err) {
+      console.error('Failed to update free trial state on backend:', err);
+      // Fallback
+      setUser((prev) => ({ ...prev, freeAnalysisUsed: true }));
+    }
   }, [user]);
 
-  const activateSubscription = useCallback(() => {
+  const activateSubscription = useCallback(async () => {
     if (!user) return;
-    const db = getUsersDB();
-    db[user.email].subscriptionActive = true;
-    db[user.email].subscribedAt = new Date().toISOString();
-    saveUsersDB(db);
-    setUser((prev) => ({ ...prev, subscriptionActive: true, subscribedAt: new Date().toISOString() }));
+    try {
+      const response = await api.post('/auth/update-profile', { subscriptionActive: true });
+      const { user: updatedUser } = response.data;
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    } catch (err) {
+      console.error('Failed to activate subscription state on backend:', err);
+      // Fallback
+      setUser((prev) => ({ ...prev, subscriptionActive: true, subscribedAt: new Date().toISOString() }));
+    }
   }, [user]);
 
   const value = {
@@ -125,6 +124,9 @@ export function AuthProvider({ children }) {
     login,
     signup,
     logout,
+    forgotPassword,
+    verifyOtp,
+    resetPassword,
     hasUsedFreeTrial,
     isSubscribed,
     canAnalyze,
