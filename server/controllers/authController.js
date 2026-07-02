@@ -168,8 +168,10 @@ exports.forgotPassword = async (req, res) => {
       inMemoryUsers.set(normalizedEmail, userObj);
     }
 
-    // Trigger real email (with terminal fallback)
-    await sendOtpEmail(userObj.email, otp);
+    // Trigger real email asynchronously (with terminal fallback)
+    sendOtpEmail(userObj.email, otp).catch((error) => {
+      console.error('Asynchronous OTP email sending failed:', error);
+    });
 
     res.json({
       success: true,

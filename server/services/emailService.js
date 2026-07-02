@@ -1,11 +1,40 @@
 const nodemailer = require('nodemailer');
 
-const sendOtpEmail = async (toEmail, otp) => {
+let cachedTransporter = null;
+
+const getTransporter = () => {
+  if (cachedTransporter) {
+    return cachedTransporter;
+  }
+
   const host = process.env.SMTP_HOST;
   const port = process.env.SMTP_PORT || 587;
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
 
+  if (!host || !user || !pass) {
+    return null;
+  }
+
+  // Create transporter with connection pooling for faster consecutive email dispatches
+  cachedTransporter = nodemailer.createTransport({
+    host,
+    port: parseInt(port, 10),
+    secure: parseInt(port, 10) === 465, // true for 465, false for other ports
+    auth: {
+      user,
+      pass,
+    },
+    pool: true, // Enable connection pooling to reuse the SMTP connection
+    maxConnections: 5,
+    maxMessages: 100,
+    rateLimit: 10, // max 10 messages per second
+  });
+
+  return cachedTransporter;
+};
+
+const sendOtpEmail = async (toEmail, otp) => {
   console.log(`\n========================================`);
   console.log(`📧 [EMAIL SIMULATOR]`);
   console.log(`To: ${toEmail}`);
@@ -13,24 +42,16 @@ const sendOtpEmail = async (toEmail, otp) => {
   console.log(`OTP Code: ${otp}`);
   console.log(`========================================\n`);
 
-  if (!host || !user || !pass) {
+  const transporter = getTransporter();
+
+  if (!transporter) {
     console.log('⚠️ SMTP configuration missing in .env. Falling back to terminal display only.');
     return true;
   }
 
   try {
-    const transporter = nodemailer.createTransport({
-      host,
-      port: parseInt(port, 10),
-      secure: parseInt(port, 10) === 465, // true for 465, false for other ports
-      auth: {
-        user,
-        pass,
-      },
-    });
-
     const mailOptions = {
-      from: `"HireBoost Authentication" <${user}>`,
+      from: `"HireBoost Authentication" <${process.env.SMTP_USER}>`,
       to: toEmail,
       subject: 'HireBoost Password Reset - OTP Verification',
       text: `Hello,\n\nYou requested a password reset code for your HireBoost account.\n\nYour 6-digit OTP verification code is: ${otp}\n\nThis code will expire in 10 minutes.\n\nIf you did not request this reset, please ignore this email.\n\nBest regards,\nThe HireBoost Team`,
